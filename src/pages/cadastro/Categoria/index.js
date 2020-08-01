@@ -2,38 +2,25 @@ import React, { useState, useEffect } from 'react';
 import PageDefault from '../../../components/PageDefault';
 import FormField from '../../../components/FormField';
 import Button from '../../../components/Button';
+import useForm from '../../../hooks/useForm';
+import categoriasRepository from '../../../repositories/categorias';
 
 function CadastroCategoria() {
-  const [categorias, setCategorias] = useState([]);
-
   const valoresIniciais = {
     nome: '',
     descricao: '',
-    cor: '#000',
+    cor: '',
   };
 
-  const [values, setValues] = useState(valoresIniciais);
+  const [categorias, setCategorias] = useState([]);
 
-  function setValue(chave, valor) {
-    setValues({
-      ...values,
-      [chave]: valor,
-    });
-  }
-
-  function handleChange(e) {
-    setValue(
-      e.target.getAttribute('name'),
-      e.target.value,
-    );
-  }
+  const { handleChange, values, clearForm } = useForm(valoresIniciais);
 
   useEffect(() => {
-    const URL = 'http://localhost:8080/categorias';
-    fetch(URL).then(async (response) => {
-      const json = await response.json();
-      setCategorias([...json]);
-    });
+    categoriasRepository.getAllWithVideos()
+      .then((resposta) => {
+        setCategorias([...resposta]);
+      });
   }, []);
 
   return (
@@ -49,6 +36,7 @@ function CadastroCategoria() {
           ...categorias,
           values,
         ]);
+        clearForm();
       }}
       >
         <FormField
